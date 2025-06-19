@@ -3,7 +3,7 @@
 # Get the saved time (or empty) and clock time, in RFC399 format
 # This format sorts lexicographically
 
-CLOCKFILE="/storage/.fake-hwclock.data"
+CLOCKFILE="/opt/fake-hwclock/.fake-hwclock.data"
 CTIME=$(date +%s)
 
 if test -f "${CLOCKFILE}" ; then
