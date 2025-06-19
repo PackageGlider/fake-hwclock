@@ -1,12 +1,55 @@
-#!/bin/sh
+#!/bin/bash
 set -eu
+
+on_error() {
+  echo "❌ Install script failed on line $1"
+}
+
+trap 'on_error $LINENO' ERR
+
+# Check if script is run with sudo
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: This script must be run with sudo privileges."
+    echo "Please run: sudo $0"
+    on_error $LINENO
+    exit 1
+fi
+
 INSTALL_DIR=/opt/fake-hwclock
 cd $(dirname "$0")
-mkdir "$INSTALL_DIR" || true
-cp * "$INSTALL_DIR"
+
+echo "Installing fake-hwclock to $INSTALL_DIR..."
+
+# Create directory if it doesn't exist
+mkdir -p "$INSTALL_DIR"
+
+# Copy files, overwriting existing ones
+cp -f * "$INSTALL_DIR"
 cd "$INSTALL_DIR"
+
+# Set permissions
 chmod 0755 fake-hwclock
-sudo ln -s /opt/fake-hwclock/fake-hwclock /usr/bin/fake-hwclock
-cp *.service *.timer /etc/systemd/system
+
+# Create symlink, overriding if exists
+sudo ln -sf $INSTALL_DIR/fake-hwclock /usr/bin/fake-hwclock
+
+# Copy service files, overwriting existing ones
+cp -f *.service *.timer /etc/systemd/system
+
+# Remove clockfile if it already exists
+rm -f $INSTALL_DIR/.fake-hwclock.data
+
+echo "Installed at $INSTALL_DIR, linked to /usr/bin/fake-hwclock, and service files copied to /etc/systemd/system"
+
+# Reload systemd to recognize changes
+echo "Reloading systemd daemon..."
+systemctl daemon-reload
+sleep 1;
 systemctl enable fake-hwclock.service
-systemctl start fake-hwclock.service
+systemctl enable fake-hwclock-tick.timer
+sleep 1;
+systemctl restart fake-hwclock.service
+systemctl restart fake-hwclock-tick.timer
+
+systemctl list-units | grep fake-hwclock
+echo "✅ Installation completed"
