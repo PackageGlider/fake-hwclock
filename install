@@ -6,6 +6,7 @@ mkdir "$INSTALL_DIR" || true
 cp * "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 chmod 0755 fake-hwclock
+sudo ln -s /opt/fake-hwclock/fake-hwclock /usr/bin/fake-hwclock
 cp *.service *.timer /etc/systemd/system
 systemctl enable fake-hwclock.service
 systemctl start fake-hwclock.service
