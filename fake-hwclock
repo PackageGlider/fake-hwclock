@@ -17,6 +17,7 @@ setclock() {
 	if test "${FTIME}" -ge "${CTIME}" ; then
 		echo "loading saved time ${FTIME} over ${CTIME}"
 		echo "Setting clock to $(date -d "@${FTIME}")"
+		date --set="@${FTIME}"
 	else
 		echo "ignoring saved time ${FTIME} over ${CTIME}"
 	fi
