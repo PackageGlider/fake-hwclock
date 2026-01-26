@@ -31,7 +31,7 @@ cd "$INSTALL_DIR"
 chmod 0755 fake-hwclock
 
 # Create symlink, overriding if exists
-sudo ln -sf $INSTALL_DIR/fake-hwclock /usr/bin/fake-hwclock
+ln -sf $INSTALL_DIR/fake-hwclock /usr/bin/fake-hwclock
 
 # Copy service files, overwriting existing ones
 cp -f *.service *.timer /etc/systemd/system
